@@ -1,7 +1,7 @@
 {
   "name": "consolidate-scripts",
   "description": "Find script tags in HTML, consolidate and append them to the <body> tag.",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "homepage": "https://github.com/jonschlinkert/consolidate-scripts",
   "author": {
     "name": "Jon Schlinkert",
