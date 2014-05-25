@@ -1,28 +1,31 @@
+const path = require('path');
 const fs = require('fs-utils');
-const scripts = require('../..');
-
+const Scripts = require('../..');
 
 
 exports.readFixtures = function(src) {
   var files = fs.expand(src, {filter: 'isFile'});
 
-  var json = [];
-  files.forEach(function(filepath) {
+  return files.map(function(filepath) {
+    var basename = path.basename(filepath);
     var content = fs.readFileSync(filepath);
-    json = json.concat(scripts(content));
-  });
+    var html = new Scripts(content);
+    var result = html.consolidateBlocks(content);
 
-  return json;
+    exports.writeExample('test/actual/' + basename, result);
+    return result;
+  }).join('\n');
 };
+
 
 /**
  * Write example file
  *
  * @param   {String}  `dest` The destination.
- * @param   {String}  `src` The string to write.
+ * @param   {String}  `str` The string to write.
  * @return  {String}
  */
 
-exports.writeExample = function(dest, src) {
-  fs.writeFileSync(dest, JSON.stringify(src, null, 2));
+exports.writeExample = function(dest, str) {
+  fs.writeFileSync(dest, str);
 };
