@@ -2,17 +2,32 @@ const expect = require('chai').expect;
 const helpers = require('./helpers/helpers');
 const scripts = require('..');
 
+// TODO
+
 describe('script-tags:', function () {
-  var actual = helpers.readFixtures('test/fixtures/*.html');
-  // console.log(actual)
+  var html = [
+    '<!doctype html>',
+    '<html lang="en">',
+    '<head>',
+    '  <meta charset="UTF-8">',
+    '  <title>Document</title>',
+    '  <script src="bootstrap.js"></script>',
+    '</head>',
+    '<body>',
+    '  Content',
+    '</body>',
+    '</html>'
+  ].join('\n');
 
+  var actual = scripts(html);
 
-  // it('should extract inner html from the script tag.', function () {
-  //   var actual = scripts('<script src="bootstrap.js"></script>');
-  //   expect(actual[0]).to.have.property('html');
-  //   expect(actual[0].attrs).to.have.property('src');
-  //   expect(actual[0].attrs.src).to.eql('bootstrap.js');
-  // });
+  it('should extract inner html from the script tag.', function () {
+    var actual = scripts('<body><script src="bootstrap.js"></script></body>');
+    console.log(actual)
+    // expect(actual[0]).to.have.property('html');
+    // expect(actual[0].attrs).to.have.property('src');
+    // expect(actual[0].attrs.src).to.eql('bootstrap.js');
+  });
 
   // it('should extract inner html from the script tag.', function () {
   //   var actual = scripts('<script>var foo = "bar";</script>');
@@ -27,18 +42,3 @@ describe('script-tags:', function () {
   //   expect(actual[0]).to.have.property('html');
   // });
 });
-
-
-// file.writeFileSync('test/actual/index.html', consolidateBlocks(html));
-
-// var cons = new Scripts(html);
-
-// console.log(cons.src(html));
-// console.log(cons.block(html));
-// console.log(cons.remove());
-// console.log(cons.removeScriptTags());
-// console.log(cons.removeScriptBlocks());
-// console.log(cons.consolidateSrc(html));
-// console.log(cons.consolidateBlocks(html));
-// cons.consolidateSrc(html)
-// cons.consolidateBlocks(html)

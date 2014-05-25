@@ -1,6 +1,6 @@
 {
   "name": "consolidate-scripts",
-  "description": "Find script tags in HTML and consolidate them as the last thing in the body tag.",
+  "description": "Find script tags in HTML, consolidate and append them to the <body> tag.",
   "version": "0.1.0",
   "homepage": "https://github.com/jonschlinkert/consolidate-scripts",
   "author": {
@@ -21,13 +21,13 @@
     }
   ],
   "keywords": [
-    "docs",
-    "documentation",
-    "generate",
-    "generator",
-    "markdown",
-    "templates",
-    "verb"
+    "scripts",
+    "html",
+    "tag",
+    "cheerio",
+    "script",
+    "javascript",
+    "javascripts"
   ],
   "main": "index.js",
   "engines": {
@@ -44,6 +44,7 @@
   },
   "dependencies": {
     "cheerio": "^0.16.0",
+    "handlebars": "^2.0.0-alpha.4",
     "lodash": "^2.4.1"
   }
 }

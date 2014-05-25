@@ -1,42 +1,41 @@
-/**
- * Anchors <https://github.com/jonschlinkert/anchors>
+/*!
+ * consolidate-scripts <https://github.com/jonschlinkert/consolidate-scripts>
  *
  * Copyright (c) 2014 Jon Schlinkert, contributors.
  * Licensed under the MIT license.
  */
 
-
-var file = require('fs-utils');
+var Handlebars = require('handlebars');
 var cheerio = require('cheerio');
 var _ = require('lodash');
 
 
-var createTag = function (arr) {
-  return arr.map(function(content) {
-    if (content.src) {
-      return '\n<script src="' + content.src + '"></script>';
-    }
+function attributes(attr) {
+  if (attr) {
+    return Object.keys(attr).map(function (key) {
+      return ' ' + key + '="' + attr[key] + '"';
+    }).join(' ');
+  }
+}
+
+var unescape = function(str) {
+  str = str.replace(/&apos;/g, '\'');
+  return _.unescape(str);
+};
+
+
+Handlebars.registerHelper('addTags', function (context) {
+  var tags = context.map(function(obj) {
+    var attrs = attributes(obj.attr);
+    var html = obj.html || '';
+    return '\n<script' + unescape(attrs) + '>' + unescape(html) + '</script>';
   }).join('');
-};
-
-var filterBlocks = function(arr) {
-  return arr.filter(function(content) {
-    return content.html.length;
-  })
-};
-
-var createBlock = function (arr) {
-  arr = filterBlocks(arr);
-  return '\n<script>\n' + arr.map(function(content) {
-    return content.html;
-  }).join('\n') + '\n</script>\n';
-};
-
+  return new Handlebars.SafeString(tags);
+});
 
 module.exports = function (html) {
-  var orig = html;
   var $ = cheerio.load(html);
-
+  var context = {};
   var tags = [];
 
   $('script').filter(function (i, elem) {
@@ -47,25 +46,21 @@ module.exports = function (html) {
     });
   });
 
-  $('body').append('{{scripts}}');
+  $('body').append('\n{{addTags tags}}');
 
   // Compact the array
-  tags = tags.filter(Boolean);
+  context.tags = tags.filter(Boolean);
 
   // Strip script tags with `src`
-  $('script').filter(function (i, elem) {
+  $('script').filter(function () {
     return $(this).attr('src') != null;
   }).remove();
 
   // Strip script tags with inner content
-  $('script').filter(function (i, elem) {
+  $('script').filter(function () {
     return $(this).text().length !== 0;
   }).remove();
 
-  var addBlocks = _.unescape(createBlock(tags));
-  var addScripts = _.unescape(createTag(tags));
-  $('body').append(_.unescape(addScripts));
-  $('body').append(_.unescape(addBlocks));
-
-  return $.html();
+  var template = Handlebars.compile($.html());
+  return template(context);
 };
