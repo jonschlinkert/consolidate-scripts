@@ -1,0 +1,49 @@
+{
+  "name": "consolidate-scripts",
+  "description": "Find script tags in HTML and consolidate them as the last thing in the body tag.",
+  "version": "0.1.0",
+  "homepage": "https://github.com/jonschlinkert/consolidate-scripts",
+  "author": {
+    "name": "Jon Schlinkert",
+    "url": "https://github.com/jonschlinkert"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jonschlinkert/consolidate-scripts.git"
+  },
+  "bugs": {
+    "url": "https://github.com/jonschlinkert/consolidate-scripts/issues"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "https://github.com/jonschlinkert/consolidate-scripts/blob/master/LICENSE-MIT"
+    }
+  ],
+  "keywords": [
+    "docs",
+    "documentation",
+    "generate",
+    "generator",
+    "markdown",
+    "templates",
+    "verb"
+  ],
+  "main": "index.js",
+  "engines": {
+    "node": ">=0.10.0"
+  },
+  "scripts": {
+    "test": "mocha -R spec"
+  },
+  "devDependencies": {
+    "chai": "~1.9.1",
+    "fs-utils": "^0.4.3",
+    "mocha": "*",
+    "verb": "~0.2.6"
+  },
+  "dependencies": {
+    "cheerio": "^0.16.0",
+    "lodash": "^2.4.1"
+  }
+}
