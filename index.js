@@ -11,108 +11,61 @@ var cheerio = require('cheerio');
 var _ = require('lodash');
 
 
-function Scripts(html) {
-  this.$ = cheerio.load(html);
-  this.orig = html;
-
-  this._attributes = [];
-  this._block = [];
-  this._src = [];
-}
-
-
-Scripts.prototype.attributes = function (html) {
-  var $ = cheerio.load(html);
-  var attributes = this._attributes;
-
-  $('script').each(function (i, elem) {
-    var attr = [];
-    attributes.push({attribs: elem.attribs});
-  });
-
-  this._attributes = attributes.filter(Boolean);
-  return attributes;
-};
-
-Scripts.prototype.src = function () {
-  var $ = this.$;
-  var src = this._src;
-
-  $('script').filter(function (i, elem) {
-    src.push($(this).attr('src'));
-  });
-
-  this._src = src.filter(Boolean);
-  return this._src;
-};
-
-Scripts.prototype.block = function () {
-  var $ = this.$;
-  var block = this._block;
-
-  $('script').filter(function (i, elem) {
-    block.push($(this).html());
-  });
-
-  this._block = block.filter(Boolean);
-  return this._block;
-};
-
-
-Scripts.prototype.removeScriptTags = function (html) {
-  var $ = cheerio.load(html);
-
-  $('script').filter(function (i, elem) {
-    return $(this).attr('src') != null;
-  }).remove();
-
-  return $.html();
-};
-
-
-Scripts.prototype.removeScriptBlocks = function (html) {
-  var $ = cheerio.load(html);
-
-  $('script').filter(function (i, elem) {
-    return $(this).text().length !== 0;
-  }).remove();
-
-  return $.html();
-};
-
-var createTag = Scripts.prototype.createTag = function (arr) {
+var createTag = function (arr) {
   return arr.map(function(content) {
-    return '<script src="' + content + '"></script>';
-  }).join('\n');
+    if (content.src) {
+      return '\n<script src="' + content.src + '"></script>';
+    }
+  }).join('');
 };
 
-var createBlock = Scripts.prototype.createBlock = function (arr) {
-  return '<script>\n' + arr.map(function(content) {
-    return content;
+var filterBlocks = function(arr) {
+  return arr.filter(function(content) {
+    return content.html.length;
+  })
+};
+
+var createBlock = function (arr) {
+  arr = filterBlocks(arr);
+  return '\n<script>\n' + arr.map(function(content) {
+    return content.html;
   }).join('\n') + '\n</script>\n';
 };
 
 
-Scripts.prototype.consolidateSrc = function (html) {
-  var scripts = createTag(this.src());
-  var sanitized = this.removeScriptTags(html);
-  var $ = cheerio.load(sanitized);
+module.exports = function (html) {
+  var orig = html;
+  var $ = cheerio.load(html);
 
-  $('body').append(scripts).html();
+  var tags = [];
+
+  $('script').filter(function (i, elem) {
+    tags.push({
+      src: $(this).attr('src'),
+      attr: elem.attribs,
+      html: $(this).html()
+    });
+  });
+
+  $('body').append('{{scripts}}');
+
+  // Compact the array
+  tags = tags.filter(Boolean);
+
+  // Strip script tags with `src`
+  $('script').filter(function (i, elem) {
+    return $(this).attr('src') != null;
+  }).remove();
+
+  // Strip script tags with inner content
+  $('script').filter(function (i, elem) {
+    return $(this).text().length !== 0;
+  }).remove();
+
+  var addBlocks = _.unescape(createBlock(tags));
+  var addScripts = _.unescape(createTag(tags));
+  $('body').append(_.unescape(addScripts));
+  $('body').append(_.unescape(addBlocks));
+
   return $.html();
 };
-
-
-Scripts.prototype.consolidateBlocks = function (html) {
-  var scripts = _.unescape(createBlock(this.block()));
-  var sanitized = this.removeScriptBlocks(html);
-  var $ = cheerio.load(sanitized);
-  console.log(scripts)
-
-  $('body').append(_.unescape(scripts));
-  return $.html();
-};
-
-
-
-module.exports = Scripts;

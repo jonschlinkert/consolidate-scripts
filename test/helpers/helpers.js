@@ -1,6 +1,6 @@
 const path = require('path');
 const fs = require('fs-utils');
-const Scripts = require('../..');
+const scripts = require('../..');
 
 
 exports.readFixtures = function(src) {
@@ -9,8 +9,7 @@ exports.readFixtures = function(src) {
   return files.map(function(filepath) {
     var basename = path.basename(filepath);
     var content = fs.readFileSync(filepath);
-    var html = new Scripts(content);
-    var result = html.consolidateBlocks(content);
+    var result = scripts(content);
 
     exports.writeExample('test/actual/' + basename, result);
     return result;
